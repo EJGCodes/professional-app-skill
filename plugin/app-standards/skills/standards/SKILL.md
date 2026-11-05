@@ -1,8 +1,8 @@
 ---
-name: professional-application-standards
+name: standards
 description: Design, UX, writing, accessibility, SEO, legal, security, sign-in and performance standards for building, editing or reviewing any website, web app or software application. Use whenever creating or changing an application's interface, content, accounts or backend, including landing pages, dashboards, SaaS products, admin tools, desktop and mobile apps, even if the user does not mention standards or quality. Does not apply to in-game UIs.
 metadata:
-  version: 1.1.0
+  version: 2.0.0
 ---
 
 # Professional Application Standards
@@ -86,10 +86,19 @@ Read each file at the moment it is needed:
 | `references/web-developer-checklist.md` | Building any [Web] project |
 | `references/testing-tools.md` | Testing performance, accessibility or security |
 | `references/verification-checklist.md` | Delivering any build |
+| `references/project-file.md` | Reading or writing `.app-standards.json` |
+| `references/launch-task-guide.md` | Explaining builder launch tasks |
 
 ### Verification
 - Before delivering, run every applicable check in `references/verification-checklist.md`.
+- When the `standards-reviewer` agent is available (the app-standards plugin in Claude Code or Cowork), delegate verification to it instead of checking your own work. Give it the project folder, the applicable tags, and this skill's directory (`${CLAUDE_SKILL_DIR}`). Fix what it reports, then run it once more. Stop after two rounds and list anything still open in the delivery summary.
 - If a check cannot be run in the current environment, list it under "Unverified checks." Never report an unrun check as passed.
+
+### Plugin Tools
+When this skill is installed as part of the app-standards plugin, these tools are also available:
+- **Project file:** `.app-standards.json` in the project root records the project's tags, app type, frontend, host and approved rule exceptions. Read it at the start of any work on the project. When the user explicitly overrides a rule, record the exception there. Format in `references/project-file.md`.
+- **Lint hook:** after each file edit, a hook may report possible violations. Fix each one, or, if the user explicitly approved it, record it as an exception in the project file.
+- **Commands:** `/app-standards:new-app` (project setup), `/app-standards:audit` (full review of an existing project) and `/app-standards:launch-tasks` (builder launch checklist).
 
 ### Delivery Summary
 End every build with a summary using these headings. Omit any heading with nothing to report.
@@ -97,7 +106,7 @@ End every build with a summary using these headings. Omit any heading with nothi
 - **Unverified checks**: checks that could not be run.
 - **Open legal fields**: placeholder fields the builder still needs to complete, with a recommendation for legal review before launch.
 - **Open content placeholders**: marked content (such as "[Customer quote]") that must be replaced before launch.
-- **Builder launch tasks**: every applicable task from `references/web-developer-checklist.md`.
+- **Builder launch tasks**: every applicable task from `references/web-developer-checklist.md`, explained using `references/launch-task-guide.md`.
 - **Security issues needing attention**: audit or scan findings that could not be fixed.
 - **Existing violations**: rule breaks in code you did not write, with a recommendation to fix them.
 - **Notes**: anything else the builder needs to know.

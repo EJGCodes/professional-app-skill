@@ -224,24 +224,33 @@ The SEO score target applies only to indexable public pages. Performance, Access
 Add the Content-Security-Policy per the rules above (hashes in the static config, nonces in middleware). On other hosts, write the equivalent configuration.
 
 ## Builder Launch Tasks
-Tasks Claude cannot complete. Add each applicable one to the delivery summary.
+Tasks Claude cannot complete. Add each applicable one to the delivery summary, explained with `launch-task-guide.md`. `/app-standards:launch-tasks` writes them to a checklist file.
 
 **Domains and hosting**
 - Connect the domain and any subdomains in Vercel (or the chosen host), and create their DNS records.
+- Set the production environment variables in the host.
+
+**Email**
 - Add the email DNS records (SPF, DKIM, DMARC) and verify the sending domain with the email provider.
+
+**Accounts**
+- Create OAuth apps with each sign-in provider (Google Cloud, Apple Developer, Microsoft Entra, GitHub, Discord) and add the credentials to Supabase.
+- Set up an SMS provider (such as Twilio) to enable phone sign-in and text message codes.
+- Review the Supabase production settings (site and redirect URLs, custom SMTP, leaked password protection, advisors).
+
+**Payments**
+- Switch payments to live mode and register the production webhook.
 
 **Search and sharing**
 - Submit the sitemap in Google Search Console and Bing Webmaster Tools.
 - Run PageSpeed Insights on the deployed public pages, and check the Search Console Core Web Vitals report once real-user data is available.
 - Check link previews with the Facebook Sharing Debugger and LinkedIn Post Inspector.
 
-**Public files**
+**Content and legal**
+- Fill in every open legal field and have the legal pages reviewed.
+- Replace every content placeholder.
 - Fill in the TEAM and THANKS sections of humans.txt.
 - Confirm a security contact so security.txt can be published, and renew it before its `Expires` date.
-
-**Accounts**
-- Create OAuth apps with each sign-in provider (Google Cloud, Apple Developer, Microsoft Entra, GitHub, Discord) and add the credentials to Supabase.
-- Set up an SMS provider (such as Twilio) to enable phone sign-in and text message codes.
 
 **Testing**
 - Test on real devices and browsers (for example with BrowserStack).

@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.0.0
+
+The standards skill is now the app-standards plugin.
+
+### New
+- `/app-standards:new-app` asks the project-start questions, recommends a stack and writes `.app-standards.json`.
+- `/app-standards:audit` reviews an existing project and reports findings by severity without changing files.
+- `/app-standards:launch-tasks` writes `LAUNCH-CHECKLIST.md` and explains how to complete each task.
+- `standards-reviewer` agent verifies builds independently, read-only, with up to two fix rounds.
+- Lint hook flags violations after each edit (Node.js, with a bash fallback), and supports a full-project scan.
+- Session-start hook notes that the standards apply in application folders, and stays quiet in game engine projects.
+- `.app-standards.json` project file records tags, stack choices and approved rule exceptions.
+- Reference files: `project-file.md` and `launch-task-guide.md`.
+- Builder launch tasks added for production environment variables, Supabase production settings, live payments, open legal fields and content placeholders.
+- Marketplace file, README and MIT license for sharing.
+
+### Changed
+- The core skill is named `standards` inside the plugin. The standalone release keeps the name `professional-application-standards`.
+- Verification is delegated to the reviewer agent when it is available.
+
 ## 1.1.0
 
 ### New

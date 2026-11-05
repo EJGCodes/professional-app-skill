@@ -1,0 +1,14 @@
+{
+  "name": "app-standards-marketplace",
+  "description": "Marketplace for the app-standards plugin.",
+  "owner": {
+    "name": "[Your Name]"
+  },
+  "plugins": [
+    {
+      "name": "app-standards",
+      "source": "./",
+      "description": "Professional standards for building websites, web apps and software, with an independent reviewer and an edit-time lint hook."
+    }
+  ]
+}
