@@ -2,7 +2,7 @@
 name: professional-application-standards
 description: Design, UX, writing, accessibility, SEO, legal, security, sign-in and performance standards for building, editing or reviewing any website, web app or software application. Use whenever creating or changing an application's interface, content, accounts or backend, including landing pages, dashboards, SaaS products, admin tools, desktop and mobile apps, even if the user does not mention standards or quality. Does not apply to in-game UIs.
 metadata:
-  version: 2.1.0
+  version: 2.2
 ---
 
 # Professional Application Standards
@@ -90,6 +90,7 @@ Read each file at the moment it is needed:
 | `references/verification-checklist.md` | Delivering any build |
 | `references/components.md` | Building cards, buttons, navbar controls, download buttons, the theme toggle or any title |
 | `references/layout-patterns.md` | Laying out any page, navbar or app shell |
+| `references/audit-and-fix.md` | Auditing a project or fixing audit findings |
 | `references/project-file.md` | Reading or writing `.app-standards.json` |
 | `references/launch-task-guide.md` | Explaining builder launch tasks |
 
@@ -98,14 +99,19 @@ Read each file at the moment it is needed:
 
 ### Verification
 - Before delivering, run every applicable check in `references/verification-checklist.md`.
-- When the `standards-reviewer` agent is available (the app-standards plugin in Claude Code or Cowork), delegate verification to it instead of checking your own work. Give it the project folder, the applicable tags, and this skill's directory (`${CLAUDE_SKILL_DIR}`). Fix what it reports, then run it once more. Stop after two rounds and list anything still open in the delivery summary.
+- When the `standards-reviewer` agent is available (the app-standards plugin in Claude Code or Cowork), delegate verification to it in build review mode instead of checking your own work. Give it the project folder, the applicable tags, and this skill's directory (`${CLAUDE_SKILL_DIR}`). Fix what it reports, then run it once more. Stop after two rounds and list anything still open in the delivery summary.
+- Without the agent, also run this skill's lint script on the project: `node scripts/lint.js --scan <project folder>` from this skill's directory (`bash scripts/lint.sh` reads one file at a time when Node isn't available).
+
+### Audit and Fix
+When the user asks to audit, review, check or fix a project against these standards, follow `references/audit-and-fix.md`. It saves findings with evidence to `.app-standards/audit.json`, asks every judgment call up front, and fixes in small verified phases: in fresh agents where available, otherwise one phase per turn in the conversation.
 - If a check cannot be run in the current environment, list it under "Unverified checks." Never report an unrun check as passed.
 
 ### Plugin Tools
 When this skill is installed as part of the app-standards plugin, these tools are also available:
 - **Project file:** `.app-standards.json` in the project root records the project's tags, app type, frontend, host and approved rule exceptions. Read it at the start of any work on the project. When the user explicitly overrides a rule, record the exception there. Format in `references/project-file.md`.
 - **Lint hook:** after each file edit, a hook may report possible violations. Fix each one, or, if the user explicitly approved it, record it as an exception in the project file.
-- **Commands:** `/app-standards:new-app` (project setup), `/app-standards:audit` (full review of an existing project) and `/app-standards:launch-tasks` (builder launch checklist).
+- **Commands:** `/app-standards:new-app` (project setup), `/app-standards:audit` (find problems and save them), `/app-standards:fix` (fix saved problems in phases, auditing first if needed) and `/app-standards:launch-tasks` (builder launch checklist).
+- **Agents:** `standards-reviewer` (read-only; audits and verifies) and `standards-fixer` (fixes one phase of findings at a time).
 
 ### Delivery Summary
 End every build with a summary using these headings. Omit any heading with nothing to report.

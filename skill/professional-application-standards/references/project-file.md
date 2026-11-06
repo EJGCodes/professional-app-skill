@@ -53,6 +53,8 @@ Read this before reading or writing `.app-standards.json`. The file lives in the
 
 Never store legal business details, personal information or secrets in this file. Legal details go directly into the legal pages.
 
+Audit findings and fix progress are kept separately, in `.app-standards/audit.json` (see `audit-and-fix.md`). That folder is listed in `.gitignore`.
+
 ## Exceptions
 
 Each exception has:

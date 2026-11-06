@@ -1,42 +1,28 @@
 ---
 name: audit
-description: Audits an existing application against the app-standards rules and produces a findings report ordered by severity, without changing any files.
+description: Audits an existing application against the app-standards rules, saves the findings with evidence for later fixing, and reports them by severity without changing any project files.
 argument-hint: "[folder to audit]"
 disable-model-invocation: true
 ---
 
 # Standards Audit
 
-Review a project against the app-standards rules and report what breaks them. This command only reports. Fix nothing unless the user asks afterward.
+Load the `standards` skill from this plugin, then read `${CLAUDE_PLUGIN_ROOT}/skills/standards/references/audit-and-fix.md` and run **Stage 1: Audit** only.
 
-## 1. Set the target
 - Audit the folder in `$ARGUMENTS` if given, otherwise the current project root.
-- Read `.app-standards.json` if it exists. If it doesn't, infer the applicability tags from the code (sign-in code means Accounts, a payment SDK means Payments, and so on), say which tags you inferred, and suggest running `/app-standards:new-app` afterward to record them.
+- In agent mode, give the `standards-reviewer` agent the target folder, the tags and exceptions, the skill directory `${CLAUDE_PLUGIN_ROOT}/skills/standards`, and audit mode.
+- Run the reviewer in the foreground and wait for its result.
+- In chat mode, run `${CLAUDE_PLUGIN_ROOT}/skills/standards/scripts/lint.js --scan <folder>` and work through the verification checklist yourself.
+- Save the findings to `.app-standards/audit.json`. That file, and adding `.app-standards/` to `.gitignore`, are the only changes this command makes.
 
-## 2. Run the review
-Delegate the review to the `standards-reviewer` agent. Give it:
-- The target folder.
-- The applicability tags and any approved exceptions from the project file.
-- The standards skill directory: `${CLAUDE_PLUGIN_ROOT}/skills/standards`
-- The lint script path: `${CLAUDE_PLUGIN_ROOT}/hooks/scripts/lint.js`
+Then report:
 
-If agents are not available in this environment, load the `standards` skill and run `${CLAUDE_PLUGIN_ROOT}/skills/standards/references/verification-checklist.md` yourself, and say in the report that the review was not independent.
+**Summary:** findings per severity, tags audited, and whether the audit was independent.
 
-## 3. Report
-Present the reviewer's findings in this format:
-
-**Summary:** the number of findings at each severity, the tags audited, and whether the review was independent.
-
-**Findings,** grouped by severity, then by skill section:
-- **Critical:** security or privacy exposure, data loss, payments.
-- **High:** accessibility blockers, legal requirements, broken functionality or links.
-- **Medium:** rule violations users can see (design, writing, layout).
-- **Low:** polish and consistency.
-
-For each finding: the file and line, the rule broken (with its section number), why it matters in one sentence, and the fix.
+**Findings,** grouped by severity, then by skill section. For each: its ID, the file and line, the rule broken (with its section number), why it matters in one sentence, and the fix.
 
 **Approved exceptions:** listed separately, not counted as findings.
 
 **Unverified checks:** every check that could not be run, and why.
 
-Then ask whether the user wants the findings fixed, and in what order.
+End by telling the user that `/app-standards:fix` will fix these in phases, asking any needed decisions first.

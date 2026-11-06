@@ -19,7 +19,7 @@ const MAX_MESSAGE_CHARS = 4000;
 const SKIP_DIRS = new Set([
   'node_modules', '.git', 'dist', 'build', 'out', '.next', '.nuxt', '.svelte-kit',
   '.output', '.vercel', '.netlify', '.astro', 'coverage', 'vendor', '.turbo', '.cache',
-  '.claude', '.claude-plugin', 'public/vendor'
+  '.claude', '.claude-plugin', '.app-standards', 'public/vendor'
 ]);
 const SKIP_FILES = new Set([
   'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lockb', 'bun.lock',

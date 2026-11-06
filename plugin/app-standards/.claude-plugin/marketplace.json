@@ -2,7 +2,7 @@
   "name": "app-standards-marketplace",
   "description": "Marketplace for the app-standards plugin.",
   "owner": {
-    "name": "EJ"
+    "name": "[Your Name]"
   },
   "plugins": [
     {

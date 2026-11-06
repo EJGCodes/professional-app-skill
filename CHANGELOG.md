@@ -1,6 +1,24 @@
 # Changelog
 
-## 2.1.0
+## 2.2
+
+### New
+- `/app-standards:fix` fixes audit findings in small phases, and runs an audit first when there isn't one, so a single command can find and fix problems.
+- `standards-fixer` agent fixes one phase at a time in a fresh context, changing only the listed findings and never making judgment calls on its own.
+- `audit-and-fix.md` reference: one procedure for every environment. Claude Code and Cowork run all phases automatically with fresh agents; regular chat runs one phase per message and suggests a new chat after about 8 phases.
+- Findings are saved with evidence (file, line and exact text) to `.app-standards/audit.json`, which is added to `.gitignore`. Fixes locate each problem by its evidence and skip anything that moved or needs an unmade decision.
+- Every judgment call is asked once, before any fixing starts.
+- The standalone skill follows the same audit and fix procedure when asked, without slash commands.
+- The findings file is deleted once every finding is fixed or kept on purpose, and kept when work remains. `/app-standards:fix clear` deletes it on demand.
+- The plugin folder includes its own README, license and changelog, so it works as a repository on its own.
+
+### Changed
+- `/app-standards:audit` now saves its findings for `/app-standards:fix`.
+- `standards-reviewer` has audit, verify and build review modes, returns structured results, and is the only one that can confirm a fix.
+- The lint script moved into the standards skill (`skills/standards/scripts/`), so it is available in chat and in the standalone skill. The hooks call that copy.
+- The lint skips the `.app-standards/` folder.
+
+## 2.1
 
 ### New
 - Section 15, Components and Layouts, with two reference files: `components.md` (cards, interaction states, titles, navbar icon buttons, theme toggle, download buttons, icons and image data) and `layout-patterns.md` (standard layouts by app type, navbar order and element placement).
@@ -17,7 +35,7 @@
 - End-of-turn check that requires fixes for dashes, separator characters, banned fonts, encoded assets and vague titles before a turn ends, with a two-attempt limit.
 - `brand` fields in the project file, and launch tasks for checking deployed headers and replacing a placeholder favicon.
 
-## 2.0.0
+## 2.0
 
 The standards skill is now the app-standards plugin.
 
@@ -37,7 +55,7 @@ The standards skill is now the app-standards plugin.
 - The core skill is named `standards` inside the plugin. The standalone release keeps the name `professional-application-standards`.
 - Verification is delegated to the reviewer agent when it is available.
 
-## 1.1.0
+## 1.1
 
 ### New
 - Section 13: Web Compatibility and Delivery (browser support, no-JavaScript fallbacks, viewport, print styles, caching headers, favicon set and web manifest).
@@ -51,7 +69,7 @@ The standards skill is now the app-standards plugin.
 - Account deletion 14-day grace period and legal record retention.
 - Vercel as the default host.
 - Delivery summary headings for "Open content placeholders" and "Builder launch tasks."
-- `metadata.version` in the frontmatter and this changelog.
+- A version number in the skill's frontmatter, and this changelog.
 
 ### Changed
 - Public pages now require server rendering or static generation.
@@ -63,5 +81,5 @@ The standards skill is now the app-standards plugin.
 - SKILL.md now states the key rules for each section, with full details in the reference files.
 - Description updated to cover SEO, sign-in and accounts.
 
-## 1.0.0
+## 1.0
 - Initial release.

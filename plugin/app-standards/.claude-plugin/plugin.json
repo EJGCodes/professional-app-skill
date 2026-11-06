@@ -1,6 +1,6 @@
 {
   "name": "app-standards",
-  "version": "2.1.0",
+  "version": "2.2",
   "description": "Professional design, UX, writing, accessibility, SEO, legal, security, sign-in and performance standards for any website, web app or software application, with an independent reviewer and an edit-time lint hook.",
   "license": "MIT",
   "keywords": ["web-development", "design-standards", "accessibility", "security", "seo", "code-review", "lint"]

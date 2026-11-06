@@ -38,7 +38,7 @@ prepare() {
   case "$FILE" in /*|[A-Za-z]:*) ;; *) FILE="$CWD/$FILE" ;; esac
   [ -f "$FILE" ] || return 1
   case "$FILE" in
-    */node_modules/*|*/.git/*|*/dist/*|*/build/*|*/out/*|*/.next/*|*/.nuxt/*|*/.svelte-kit/*|*/.output/*|*/.vercel/*|*/coverage/*|*/vendor/*|*/.claude/*) return 1 ;;
+    */node_modules/*|*/.git/*|*/dist/*|*/build/*|*/out/*|*/.next/*|*/.nuxt/*|*/.svelte-kit/*|*/.output/*|*/.vercel/*|*/coverage/*|*/vendor/*|*/.claude/*|*/.app-standards/*) return 1 ;;
     *.min.js|*.min.css|*.map|*/package-lock.json|*/yarn.lock|*/pnpm-lock.yaml|*/.app-standards.json) return 1 ;;
   esac
   if [ -n "$CLAUDE_PLUGIN_ROOT" ]; then
