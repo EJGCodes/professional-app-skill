@@ -1,6 +1,6 @@
 # Components
 
-Read this before building cards, buttons, navbar controls, download buttons, the theme toggle, or any title. Every component also follows the color, typography and spacing rules in SKILL.md.
+Read this before building cards, buttons, navbar controls, tooltips, download buttons, the theme toggle, or any title. Every component also follows the color, typography and spacing rules in SKILL.md.
 
 ## Interaction States
 
@@ -16,10 +16,15 @@ Every interactive element has every state below that applies to it. A component 
 | Input | Border darkens | Not applicable | Accent border plus solid outline | Faded, neutral background | Not applicable |
 | Toggle, checkbox, radio | Tonal ring or background | Scales slightly | Solid outline | Faded | Not applicable |
 
-- Transitions last 120 to 200 ms with an ease-out curve, using `transform`, `opacity`, `background-color`, `border-color` and `color` only.
+- Hover, pressed and focus states always have more contrast than the resting state, never less.
+- Transitions last 120 to 200 ms with an ease-out curve, using `transform`, `opacity`, `background-color`, `border-color` and `color` only. Name each property; never `transition: all`.
 - States never use shadows (Section 1). Depth comes from shade, border and movement.
 - With reduced motion on, keep the color changes and remove the movement and scaling.
 - Pointer-only states (hover) never carry information that keyboard and touch users can't get.
+
+## Corner Radius
+- Take every radius from the radius scale (Section 1).
+- A child element's radius is never larger than its parent's. When elements are nested with padding between them, make the curves concentric: inner radius = outer radius minus the padding (never below zero).
 
 ## Cards
 
@@ -69,6 +74,34 @@ Icon buttons in the navbar (search, theme toggle, menu, account, cart, notificat
 - Keep an invisible tap area of at least 44×44 px.
 - Have an accessible name (`aria-label`) and a tooltip with the same text.
 - Use the project's icon set, referenced by name.
+
+## Tooltips
+
+### When to use them
+- Inline help comes first. Anything the user needs to complete a task goes in a visible label, helper text or instructions, never only in a tooltip.
+- Use tooltips only for short supplementary hints and to name icon-only buttons.
+- Every tooltip's information is also available on touch devices, which have no hover: through a visible label, or a help button that opens a popover when tapped.
+
+### Behavior
+- Show on hover after about 500 ms, and immediately on keyboard focus.
+- Once one tooltip has been shown, moving to a neighboring element shows its tooltip with no delay.
+- Stay open while the pointer moves from the element onto the tooltip.
+- Close on Escape, when the pointer leaves both the element and the tooltip, and when focus moves away.
+- Never cover the element being described, and never take focus.
+
+### Accessibility
+- A tooltip that names an icon-only button uses the same text as its `aria-label`.
+- A tooltip that adds a description is connected with `aria-describedby` and has `role="tooltip"`.
+- Never use the HTML `title` attribute as a tooltip. It is slow to appear, can't be styled, and doesn't work for keyboard or touch users.
+
+### Content
+- A few words to one short sentence.
+- No links, buttons or other interactive elements. Content that needs them goes in a popover.
+
+### Position and style
+- Open above the element by default, and flip to another side near the edges of the screen so the whole tooltip stays visible.
+- Start the appear animation from the side nearest the element.
+- Use the theme's colors with a contrasting background or a border (never a shadow), meet the contrast requirements in light and dark mode, and use a radius from the scale.
 
 ## Theme Toggle
 

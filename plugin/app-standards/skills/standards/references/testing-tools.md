@@ -29,6 +29,12 @@ Read this before testing performance, accessibility or security.
 | Image and GIF optimization | ffmpeg, gifsicle, SVGO |
 | Production errors (optional) | Sentry, configured to strip personal data |
 
+## Testing Conditions
+- Profile with CPU and network throttling turned on in the browser's developer tools.
+- Test in macOS Safari, and on an iPhone in Low Power Mode, which slows animations and timers.
+- Test on macOS with "Show scroll bars" set to "Always."
+- In React apps, check re-renders with React DevTools or React Scan.
+
 ## Native and Desktop Applications
 
 | Area | Tools |

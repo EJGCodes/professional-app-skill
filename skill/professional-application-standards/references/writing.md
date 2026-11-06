@@ -2,6 +2,10 @@
 
 Read this before writing any content, labels, messages or emails. These rules apply to visible content, code comments, commit messages, READMEs, documentation, email templates and legal pages. They do not apply to the delivery summary or chat messages after the build.
 
+## Quotes and Language
+- Visible text uses curly quotes and apostrophes (“ ” ‘ ’). Code, attribute values and data keep straight quotes.
+- Mark brand names, product names, code and technical identifiers with `translate="no"` so browser translation leaves them unchanged.
+
 ## Punctuation
 - No em dashes, en dashes used as dashes, or spaced hyphens used as dashes. Use commas, colons, periods or parentheses instead.
 - No separator characters between inline items: no middle dot (·), bullet (•), dot operator (⋅) or vertical bar (|), including their HTML entities (`&middot;`, `&bull;`). Instead of "5 min read · March 4," use spacing between separate elements, separate lines, or a divider drawn with CSS.
@@ -18,8 +22,11 @@ Every call to action, button and instruction names the action or the outcome.
 
 ## Messages
 - Every info and error message says what happened and the specific next step, in plain language.
+- A short, industry-standard opening is allowed even if it is general ("Something went wrong." "Payment declined." "You're offline."), as long as the very next sentence gives the specific cause and the next step. For example: "Something went wrong. Your deployment didn't finish because the build timed out. Retry the deployment, or check the build log."
+- Banned: a general message with nothing after it, such as "Something went wrong" or "An error occurred" on its own.
+- Write in a positive, problem-solving tone, including errors: focus on what the user can do next, never on blame.
 - Any button in a message names its action.
-- Banned: "Something went wrong," "An error occurred" or similar without a cause and next step.
+- This applies to errors, notices, toasts, confirmations and empty states.
 - Never show raw error codes or stack traces.
 - Exception: sign-in, sign-up and password reset use the generic messages in `accounts-and-onboarding.md` so they never reveal whether an account exists.
 

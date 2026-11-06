@@ -58,8 +58,13 @@ Read this before laying out any page, navbar or app shell. People expect a produ
 - Public sites put the same options on an "Accessibility" page linked from the footer, together with an accessibility statement.
 - Never use a floating accessibility widget or overlay button.
 
+## Common Pages
+- Recommend a FAQ page for any application that may benefit from one (products, services, pricing, accounts, bookings). Answers come from the builder or are clearly marked placeholders.
+- Add breadcrumbs to any page more than two levels deep.
+
 ## Footer
 
 - Columns of grouped links (such as Product, Company, Resources, Legal) on desktop, stacked on mobile.
-- Bottom row: copyright with the automatic year, legal links and cookie settings.
+- Bottom row: copyright with the year generated automatically, legal links and cookie settings.
+- Every footer link works and leads where its text says.
 - Social links use official brand logos (Section 4).

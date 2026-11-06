@@ -9,7 +9,7 @@ The rules come in two forms:
 
 Install one or the other. Installing both loads the same rules twice.
 
-Version 2.2. Release history is in [CHANGELOG.md](CHANGELOG.md).
+Version 2.3. Release history is in [CHANGELOG.md](CHANGELOG.md).
 
 ## Why it exists
 
@@ -19,7 +19,7 @@ AI-built sites tend to share the same problems: gradient blobs and drop shadows,
 
 | Component | Name | What it does |
 |---|---|---|
-| Skill | `standards` | The full rule set in 15 sections, 15 reference files Claude reads only when a task needs them, and the lint script |
+| Skill | `standards` | The full rule set in 15 sections, 16 reference files Claude reads only when a task needs them, and the lint script |
 | Command | `/app-standards:new-app` | Asks the project-start questions, recommends a stack and writes the project file |
 | Command | `/app-standards:audit` | Reviews an existing project, saves every finding with evidence, and reports them by severity without changing project files |
 | Command | `/app-standards:fix` | Fixes saved findings in small verified phases, running an audit first if there isn't one |
@@ -46,7 +46,7 @@ AI-built sites tend to share the same problems: gradient blobs and drop shadows,
 12. Performance: PageSpeed scores of 90 or more, a JavaScript budget, retries and offline handling.
 13. Web compatibility: browser support, fallbacks when JavaScript fails, print styles and caching headers.
 14. Accounts and onboarding: provider sign-in, two-factor authentication, interactive onboarding and an account section.
-15. Components and layouts: cards, interaction states for every control, navbar order and icon buttons, download buttons, and the standard layout for each app type.
+15. Components and layouts: cards, tooltips, interaction states for every control, navbar order and icon buttons, download buttons, and the standard layout for each app type.
 
 Each rule has an applicability tag (such as Accounts, Payments or Web), so a static landing page never gets login rules and a native app skips web-only rules.
 
@@ -72,14 +72,14 @@ To install it from this folder so it loads in every session:
 To install it from GitHub, push the contents of the `plugin/app-standards` folder to a repository, so that its hidden `.claude-plugin` folder sits at the top of the repository. Then run:
 
 ```bash
-/plugin marketplace add EJGCodes/professional-app-skill
+/plugin marketplace add <owner>/<repo>
 /plugin install app-standards@app-standards-marketplace
 ```
 
 On Claude Code 2.1.275 or later, one command does both:
 
 ```bash
-/plugin install app-standards --marketplace EJGCodes/professional-app-skill
+/plugin install app-standards --marketplace <owner>/<repo>
 ```
 
 The hidden `.claude-plugin` folder inside `app-standards` holds two files: `plugin.json`, which describes the plugin, and `marketplace.json`, which lets Claude Code install it from a folder or repository.
@@ -216,6 +216,9 @@ Leave out `value` to make an exception for the whole rule, or add `paths` to lim
 | `vague-title` | Section titles such as "Why it matters" or "The bottom line" |
 | `encoded-asset` | Images or fonts encoded into the code as `data:` strings, and pasted SVG icon drawings |
 | `vercel-config` | A `vercel.json` that isn't valid JSON, lacks the `$schema` line, or uses legacy properties |
+| `transition-all` | `transition: all`, which animates properties that were never meant to move |
+| `title-tooltip` | The HTML `title` attribute used as a tooltip |
+| `outline-removed` | A removed focus outline, which needs a visible replacement |
 
 The hook only reports to Claude. It never blocks an edit or changes a file. It skips `node_modules`, build output, lockfiles and minified files. It only sees files Claude writes with its edit tools, not files created through shell commands; the reviewer catches those at the end of a build. Checks that would go off during normal work (clichés, `console.log`, button wording) are left to the reviewer.
 
@@ -248,7 +251,7 @@ node plugin/app-standards/skills/standards/scripts/lint.js --scan path/to/projec
 │   └── app-standards/                       the plugin
 │       ├── .claude-plugin/                  (hidden) plugin.json and marketplace.json
 │       ├── skills/
-│       │   ├── standards/                   the rules, 15 reference files and the lint script
+│       │   ├── standards/                   the rules, 16 reference files and the lint script
 │       │   ├── new-app/
 │       │   ├── audit/
 │       │   ├── fix/

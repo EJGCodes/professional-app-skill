@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.3
+
+Several rules in this release are adapted from Vercel's [Web Interface Guidelines](https://vercel.com/design/guidelines).
+
+### New
+- Tooltip rules: inline help first, hover and keyboard focus behavior, touch device equivalents, accessibility setup, content limits, position and style, and no HTML `title` tooltips.
+- Loading states wait before appearing and stay visible long enough to avoid flicker.
+- View state (filters, tabs, pagination, search, expanded panels) lives in the URL, and Back and Forward restore scroll position.
+- Autofocus for single-input pages on desktop only.
+- No dead zones on controls, drag and gesture alternatives, and keyboard shortcuts that work on every keyboard layout.
+- Motion rules: animate with a purpose, matching easing and transform origin, no `transition: all`, Safari-safe SVG animation, sharp scaled text, and pause controls for long automatic motion.
+- Form rules: Enter key behavior (including composer-style textareas that send on Enter), no blocked keystrokes, submit never disabled in advance, errors focused on submit, placeholders as format examples, spellcheck settings, password manager behavior, trimmed values, and Windows dropdown colors.
+- Writing rules: curly quotes, `translate="no"` for names and code, positive framing, and matching currency decimals. A short general message opening is allowed when the next sentence gives the cause and next step.
+- Visual rules: nested corner radius, hue-tinted borders and text, stronger contrast for interaction states, APCA contrast checks alongside WCAG, `color-scheme`, and `theme-color` matching the page background.
+- Web rules: no desktop rubber-banding, only needed scrollbars, CSS-driven layout, language chosen from browser settings, font subsetting, Web Workers, list virtualization, fast inputs, re-render checks, a 500 ms target for write requests, and Safari looping video.
+- Builders can choose dark mode as the default theme; the other theme always remains available.
+- Lint checks: `transition-all`, `title-tooltip` and `outline-removed`.
+- Testing conditions: throttling, macOS Safari, iOS Low Power Mode and always-visible scrollbars.
+
+### Changed
+- SKILL.md now holds the key rules only, cut from about 6,500 words to about 3,200. Setup, tools, verification and the delivery summary moved to a new `references/workflow.md`, and details that were repeated in SKILL.md now live only in their reference files. Every rule was checked to still exist after the move.
+
 ## 2.2
 
 ### New

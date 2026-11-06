@@ -19,7 +19,8 @@ Read this before reading or writing `.app-standards.json`. The file lives in the
   "brand": {
     "accentColor": "user-chosen",
     "logo": "provided",
-    "favicon": "placeholder"
+    "favicon": "placeholder",
+    "defaultTheme": "light"
   },
   "exceptions": [
     {
@@ -49,6 +50,7 @@ Read this before reading or writing `.app-standards.json`. The file lives in the
 | `brand.accentColor` | `"user-chosen"` or `"claude-chosen"` | Whether the user picked the accent color. `"claude-chosen"` means the user didn't answer, so offer the options again at the next chance |
 | `brand.logo` | `"provided"` or `"text"` | Whether the header uses the user's logo or the site name as text |
 | `brand.favicon` | `"provided"` or `"placeholder"` | Whether the favicon is the user's or a generic placeholder |
+| `brand.defaultTheme` | `"light"` or `"dark"` | The theme shown on first visit. Light unless the builder asked for dark; the other theme is always available |
 | `exceptions` | List | Rule exceptions the user explicitly approved |
 
 Never store legal business details, personal information or secrets in this file. Legal details go directly into the legal pages.
@@ -84,5 +86,8 @@ Record an exception only when the user explicitly asks for something a rule bans
 | `vague-title` | Banned vague or dramatic section titles in headings |
 | `encoded-asset` | Images or fonts encoded as `data:` strings, and pasted SVG icon drawing data |
 | `vercel-config` | A `vercel.json` that is not valid JSON, lacks the `$schema` line, or uses legacy properties |
+| `transition-all` | `transition: all` or `transition-property: all` |
+| `title-tooltip` | The HTML `title` attribute used as a tooltip |
+| `outline-removed` | `outline: none` or `outline: 0`, which needs a visible `:focus-visible` replacement |
 
 The end-of-turn check requires fixes for `dash`, `separator`, `banned-font`, `encoded-asset` and `vague-title` in files changed during the turn. All other checks only flag.

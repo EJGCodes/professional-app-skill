@@ -24,12 +24,13 @@ Use the description in `$ARGUMENTS` (if given) to skip anything it already answe
 2. **Features:** accounts, payments, file uploads, email or text messages, public pages or public user content. Derive the applicability tags from the answers. Add `Backend` when any feature needs a server or database, and `Data` when personal data or non-essential cookies are involved.
 3. **Sensitive data:** health, financial, precise location, government ID, or anything involving minors.
 4. **App type:** professional or creative. Ask only if the description doesn't make it clear.
-5. **Frontend:** recommend per the Frontend and Hosting rules in the standards skill, and let the user choose.
+5. **Frontend:** recommend per the Frontend and Hosting section of `${CLAUDE_PLUGIN_ROOT}/skills/standards/references/workflow.md`, and let the user choose.
 6. **Host:** Vercel unless the user prefers another.
 7. **Regions:** where the app operates or has users.
 8. **Brand colors:** ask whether the user has brand colors. If not, show a few accent color options as swatches (with their names and how each suits the app) and let the user choose. Never pick one without asking. If the user skips, pick one, say which and why, and record `"accentColor": "claude-chosen"`.
-9. **Logo and favicon:** ask whether the user has them. Without a logo, the header uses the site name as text. Without a favicon, use a generic neutral placeholder.
-10. **Legal details:** ask whether the user wants to provide them now (legal business name, address, contact email, third-party services, retention periods, and refund terms if payments apply). Never ask for personal information about team members. If the user skips, record `"legalDetails": "pending"`.
+9. **Default theme:** light unless the user wants dark as the default. Either way, the other theme stays available through the toggle.
+10. **Logo and favicon:** ask whether the user has them. Without a logo, the header uses the site name as text. Without a favicon, use a generic neutral placeholder.
+11. **Legal details:** ask whether the user wants to provide them now (legal business name, address, contact email, third-party services, retention periods, and refund terms if payments apply). Never ask for personal information about team members. If the user skips, record `"legalDetails": "pending"`.
 
 ## 4. Recommend the stack
 Summarize the recommended stack (frontend, backend, host, email provider if messaging applies, payment provider if payments apply) with one line on why each fits, and name the standard layout for the app type.

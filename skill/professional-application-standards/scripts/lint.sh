@@ -110,7 +110,19 @@ flag_checks() {
     add sensitive-storage "Sensitive data in browser storage (Section 11)" "(localStorage|sessionStorage)\.setItem\([[:space:]]*['\"\`][^'\"\`]*([Tt]oken|[Aa]uth|[Ss]ession|[Jj]wt|[Uu]ser|[Ee]mail|[Pp]assword|[Ss]ecret|[Rr]efresh)"
     add number-input "type=number on a digit-only field (Section 6)" "type[[:space:]]*=[[:space:]]*[{]?[[:space:]]*['\"\`]number['\"\`].*(zip|postal|phone|tel|mobile|card|cc-|cvc|cvv|otp|one-time-code|pin|code)|(zip|postal|phone|tel|mobile|card|cc-|cvc|cvv|otp|one-time-code|pin|code).*type[[:space:]]*=[[:space:]]*[{]?[[:space:]]*['\"\`]number['\"\`]"
     add csp-unsafe "'unsafe-inline' or 'unsafe-eval' for scripts (Section 11)" "script-src[^;]*'unsafe-(inline|eval)'"
+    add transition-all "transition: all animates unintended properties (Section 5)" "transition(-property)?[[:space:]]*:[[:space:]]*all([^A-Za-z-]|$)|(^|[[:space:]\"'\`])transition-all([[:space:]\"'\`]|$)"
+    add outline-removed "Focus outline removed; needs a visible :focus-visible replacement (Section 9)" "outline[[:space:]]*:[[:space:]]*(none|0)([^0-9.]|$)|(^|[[:space:]\"'\`:])outline-none([[:space:]\"'\`]|$)"
   fi
+  case "$EXT" in
+    .html|.htm|.jsx|.tsx|.vue|.svelte|.astro|.mdx)
+      if ! excepted title-tooltip; then
+        hits="$(grep -nE -- "<[A-Za-z][A-Za-z0-9.-]*[^>]*[[:space:]]title[[:space:]]*=[[:space:]]*[\"'{]" "$FILE" 2>/dev/null \
+          | grep -vE -- "<(title|abbr|iframe|link|frame|style|meta|svg|html|head|input)([[:space:]>/]|$)" | head -5 | cut -c1-130)"
+        [ -n "$hits" ] && REPORT="$REPORT
+  [title-tooltip] HTML title attribute used as a tooltip (Section 15)
+$(printf '%s\n' "$hits" | sed 's/^/    line /')"
+      fi ;;
+  esac
   if [ "$BASE" = "package.json" ]; then
     add icon-set "Non-approved icon set (Section 4)" "\"(lucide[a-z-]*|@lucide/[a-z-]+|@heroicons/[a-z-]+|react-feather|feather-icons|@tabler/icons[a-z-]*|@phosphor-icons/[a-z-]+|phosphor-react|@radix-ui/react-icons|ionicons)\"[[:space:]]*:"
   fi

@@ -234,6 +234,31 @@ const CHECKS = [
     }
   },
   {
+    id: 'transition-all',
+    label: 'transition: all animates unintended properties (Section 5, see ux-patterns.md)',
+    ext: CODE_EXT,
+    test(line) {
+      return /\btransition(?:-property)?\s*:\s*all\b/i.test(line) || /\btransition(?:Property)?\s*:\s*["'`]all\b/.test(line) || (CLASS_CONTEXT_RE.test(line) && /(?:^|[\s"'`{])(?:[\w-]+:)*transition-all(?=$|[\s"'`}])/.test(line)) ? ['transition all'] : [];
+    }
+  },
+  {
+    id: 'title-tooltip',
+    label: 'HTML title attribute used as a tooltip (Section 15, see components.md)',
+    ext: MARKUP_EXT,
+    test(line) {
+      return /<(?!title\b|abbr\b|iframe\b|link\b|frame\b|style\b|meta\b|svg\b|html\b|head\b|input\b)[a-zA-Z][\w.-]*\b[^>]*\stitle\s*=\s*["'{]/.test(line) ? ['title attribute'] : [];
+    }
+  },
+  {
+    id: 'outline-removed',
+    label: 'Focus outline removed; needs a visible :focus-visible replacement (Section 9)',
+    ext: CODE_EXT,
+    test(line) {
+      if (/focus-visible/.test(line)) return [];
+      return /\boutline\s*:\s*(?:none|0)\b/i.test(line) || (CLASS_CONTEXT_RE.test(line) && /(?:^|[\s"'`{])(?:[\w-]+:)*outline-none(?=$|[\s"'`}])/.test(line)) ? ['outline removed'] : [];
+    }
+  },
+  {
     id: 'number-input',
     label: 'type="number" on a digit-only field that is not a quantity (Section 6)',
     ext: MARKUP_EXT,

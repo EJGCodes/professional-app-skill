@@ -36,7 +36,7 @@ Rules:
 - Moved pages 301-redirect straight to the new address, with no chains.
 - Every page is linked from at least one other page.
 - Breadcrumbs on pages more than two levels deep, with BreadcrumbList structured data.
-- Titles about 60 characters or fewer; meta descriptions about 155 characters or fewer; both unique per page.
+- Page titles follow the format "Site Name - Page Name" and stay about 60 characters or fewer; meta descriptions stay about 155 characters or fewer; both are unique per page and describe the page accurately.
 
 ## Crawlability
 - Public pages are server-rendered or statically generated.
@@ -69,7 +69,7 @@ Use JSON-LD only. Add a type only when the page actually shows that content:
 - Each language has its own URL (such as `/es`).
 - Add `hreflang` tags for every language version, plus `x-default`.
 - Set the correct `lang` attribute on every page.
-- Never switch languages automatically by IP address without a visible way to change it.
+- Choose the starting language from the browser's language settings (the `Accept-Language` header on the server, `navigator.languages` in the browser). Never choose it by IP address or location, and always show a visible way to change it.
 
 ## Sitemap
 - Generated automatically at build time.
@@ -101,7 +101,8 @@ Use JSON-LD only. Add a type only when the page actually shows that content:
 - Publish it only once a real contact is confirmed. Until then, list it under Builder launch tasks.
 
 ## Error Pages
-- 404: returns a real 404 status. A single-page app's catch-all route must also return 404, never a 200 "soft 404."
+- Every error page matches the site's design and writing rules. Creative applications may give the message more personality, but it must still offer a clear way back.
+- 404: explains that the page wasn't found, links home, and offers site navigation or search. It returns a real 404 status. A single-page app's catch-all route must also return 404, never a 200 "soft 404."
 - 500: custom server error page.
 - 503: maintenance page with a `Retry-After` header.
 - Error pages get `noindex`.
@@ -122,6 +123,11 @@ Public pages display core content and navigation with clean formatting when Java
 - Interactive features may require JavaScript, but show a clean message instead of breaking.
 
 Logged-in apps may require JavaScript, with a clean, styled `<noscript>` message.
+
+## Scrolling and Layout
+- Turn off the rubber-band bounce on desktop: set `overscroll-behavior: none` on `<html>` inside `@media (pointer: fine)`. Keep the default on touch devices so pull-to-refresh still works. Test hybrid touch laptops separately, since `pointer` describes only the main input.
+- Show only scrollbars that are needed. Fix the overflow that causes stray scrollbars instead of hiding them. Test on macOS with "Show scroll bars" set to "Always," which matches what Windows users see.
+- Let CSS handle layout with flexbox, grid and natural sizing. Never measure elements with JavaScript to position or size them when CSS can do it.
 
 ## Viewport
 - `<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">` on every page.
@@ -146,7 +152,7 @@ Logged-in apps may require JavaScript, with a clean, styled `<noscript>` message
 | Photos | AVIF or WebP, with a JPEG fallback where needed | Visually lossless (about quality 75 to 85) |
 | Logos, screenshots, line art, text graphics | Lossless WebP or PNG | Lossless |
 | Icons and illustrations | SVG | Optimized with SVGO |
-| Animated GIFs | MP4 (H.264) plus WebM, or animated WebP | Convert with ffmpeg. Play as `<video autoplay muted loop playsinline>`, paused when reduced motion is on |
+| Animated GIFs | MP4 (H.264) plus WebM, or animated WebP | Convert with ffmpeg. Play as `<video autoplay muted loop playsinline>` with a still image fallback, paused when reduced motion is on |
 | GIFs that must stay GIFs | GIF | Compress with gifsicle (`-O3 --lossy=30`), reduce colors and frame count |
 | Video | MP4 (H.264) plus WebM or AV1 | Poster image, `preload="none"` or `"metadata"`, captions |
 | Audio | AAC or Opus | Compressed, never auto-playing with sound |
@@ -155,13 +161,15 @@ Logged-in apps may require JavaScript, with a clean, styled `<noscript>` message
 - Lazy-load everything below the fold with native `loading="lazy"`.
 - Give every image and video `width` and `height` attributes.
 - Flag any single image over 200 KB.
+- For short decorative loops, an H.264 MP4 `<source>` inside `<picture>` plays like an image in Safari while other browsers show the still fallback. Put the MP4 source behind `media="(prefers-reduced-motion: no-preference)"`. Use `<video>` instead when users need playback controls or the animation carries information.
 
 ## Favicon Set
 - `favicon.ico` (32×32, with 16×16 inside).
 - `favicon.svg`, adapting to dark mode with a `prefers-color-scheme` media query inside the SVG.
 - `apple-touch-icon.png` (180×180).
-- `site.webmanifest` with icons at 192×192 and 512×512, plus a 512×512 maskable icon.
-- `theme-color` meta tags for light and dark, using the `media` attribute.
+- `site.webmanifest` with icons at 192×192 and 512×512, plus a 512×512 maskable icon. Build a full installable PWA (service worker, offline support) only when the user asks for one.
+- `theme-color` meta tags matching the page background in light and dark mode, using the `media` attribute, so the browser's own interface blends with the page.
+- `color-scheme` set on `<html>` (`light` or `dark`, matching the active theme) so scrollbars, form controls and other browser-drawn parts match the theme.
 
 ## Performance
 - Preload the largest above-the-fold image (the LCP image) and set `fetchpriority="high"` on it.
@@ -170,6 +178,14 @@ Logged-in apps may require JavaScript, with a clean, styled `<noscript>` message
 - Serve over HTTP/2 or HTTP/3 with Brotli compression and a CDN (Vercel provides all three).
 - Add `preconnect` only for origins the page actually needs.
 - Load third-party scripts only when required.
+- Subset fonts: ship only the characters and scripts the site uses (with `unicode-range`), and only the weights and variable-font axes it uses.
+- Move long or expensive work (parsing large files, heavy calculations) to Web Workers so the page stays responsive.
+- Render long lists with virtualization (such as virtua) or `content-visibility: auto`, so only visible rows are drawn.
+- Keep typing fast: prefer uncontrolled inputs, and keep any work done on each keystroke small.
+- Keep re-renders few and fast (check with React DevTools or React Scan in React apps), and batch DOM reads and writes to avoid repeated layout recalculation.
+- Create, update and delete requests (POST, PATCH, DELETE) complete in under 500 ms.
+
+Every page scores 90 or more in Performance, Accessibility and Best Practices, and every indexable public page also scores 90 or more in SEO. Core Web Vitals stay in the "good" range (LCP 2.5 s or less, INP 200 ms or less, CLS 0.1 or less).
 
 | What is measured | Tool |
 |---|---|

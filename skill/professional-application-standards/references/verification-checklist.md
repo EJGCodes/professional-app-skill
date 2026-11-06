@@ -11,6 +11,7 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - Review each badge and chip. Remove any that do not tell the user something they need, including chips holding only step text.
 - Confirm all corner radii come from the defined radius scale.
 - Confirm the user chose the accent color, or that the choice and reason were stated when the user didn't answer.
+- Confirm nested elements have a radius no larger than their parent's.
 
 ## 2. Typography
 - Search all `font-family` declarations and font files for every banned font name in `fonts.md`. Expect zero results.
@@ -56,6 +57,12 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - Paste into every field, including passwords. Confirm paste works.
 - Go offline mid-action. Confirm the offline notice appears and the action is kept in memory and retried when the connection returns.
 - For every button, link, card, input and icon button, confirm the styles define hover, pressed (`:active`) and `:focus-visible` states, plus disabled and loading where they apply, matching the interaction state table in `components.md`. Hover, press and tab to each in the browser and confirm a visible response.
+- Search CSS for `transition: all` and `transition-property: all`. Expect zero.
+- Respond quickly to a request and confirm no loader appears; respond slowly and confirm the loader stays visible at least 300 ms.
+- Apply filters, switch tabs and change pages, then refresh and use Back and Forward. Confirm the view and scroll position are restored, and that the URL can be shared to reproduce the view.
+- Click every part of each control, including gaps between icons, text and checkboxes. Confirm there are no dead zones.
+- Confirm every drag, swipe or pinch action has a click, tap and keyboard alternative.
+- Confirm motion that plays automatically for more than 5 seconds has a pause, stop or hide control.
 
 ## 6. Forms and Input
 - Confirm every field matches the input reference table in `forms-and-data.md`, has a visible label, and has a computed font size of at least 16px.
@@ -65,6 +72,12 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - Type a search query and stop. Confirm exactly one request fires about 300 ms after the last keypress. Press Enter on a new query and confirm it fires at once with no delayed duplicate.
 - **[Accounts]** Submit sign-up with an age below the minimum. Confirm it is rejected with a clear message.
 - **[Uploads]** Upload a file over the limit and a disallowed type through the UI, then send both directly to the server. Confirm all four are rejected.
+- Submit each form empty. Confirm the button was enabled, errors appear next to their fields, and focus moves to the first error.
+- Type letters into a numbers-only field. Confirm the keystrokes appear and an explanation follows.
+- Enter a value with a trailing space. Confirm it validates without an error.
+- Press Enter in single-field forms and in the last field of longer forms. Confirm it submits. In each textarea, confirm Enter behaves as its type requires (composer or long-form).
+- Confirm placeholders show an example format without an ellipsis, and spellcheck is off where the input table says so.
+- Confirm search and other non-sign-in fields don't trigger password managers, and one-time code fields accept pasting.
 
 ## 7. Writing and Content
 - Search all visible text, code comments, READMEs, email templates and legal pages for `—`, `–` and ` - ` used as dashes. Expect zero.
@@ -77,6 +90,9 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - Search all visible text for `·`, `•`, `⋅`, `&middot;`, `&bull;` and ` | ` used as separators. Expect zero.
 - For every title or introduction that states a number ("4 steps"), count the items that follow. Confirm they match.
 - List every section title. Confirm none is on the banned list in `writing.md` and each describes its actual content.
+- Confirm visible text uses curly quotes and apostrophes, and brand and product names carry `translate="no"`.
+- Confirm every general message opening ("Something went wrong.") is followed by a specific cause and next step.
+- Confirm prices in each context use the same number of decimal places.
 
 ## 8. Navigation, Structure and Search
 - Run a link checker on every internal and external link. Expect zero broken links and zero redirect chains.
@@ -106,8 +122,10 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - Zoom to 400% at 1280 px width. Confirm content reflows without loss or horizontal scrolling.
 - Run a colorblindness simulation. Confirm no information is lost.
 - Emulate `prefers-reduced-motion`, `prefers-contrast` and forced colors. Confirm the site adapts automatically.
-- Load the site fresh with the device set to dark mode. Confirm it opens in light mode. Switch to dark mode, reload, and confirm the server renders dark mode with no flash.
+- Load the site fresh with the device set to the opposite theme. Confirm it still opens in the default theme. Switch themes, reload, and confirm the server renders the chosen theme with no flash.
 - Toggle every theme and accessibility option. Screenshot each and confirm no broken layout or styling.
+- Check text colors with an APCA contrast checker as well as WCAG.
+- Confirm the site opens in the default theme recorded in the project file, the other theme is available through the toggle, and `color-scheme` matches the active theme.
 
 ## 10. Legal, Privacy and Compliance
 - Confirm the builder was asked for legal details at the project start, and asked again after the first build if they did not answer.
@@ -150,6 +168,8 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - **[Accounts]** Sit idle past the warning time. Confirm the warning appears and a server-side draft is saved.
 - **[Accounts]** Log out, press the back button, and confirm no private page or data appears.
 - **[Accounts]** Reuse an expired session token against the API. Expect rejection.
+- With CPU and network throttling on, confirm interactions stay responsive and long lists render only visible rows.
+- Time create, update and delete requests. Confirm each completes in under 500 ms.
 
 ## 13. Web Compatibility and Delivery
 - Run the Playwright checks in Chromium, Firefox and WebKit.
@@ -159,6 +179,9 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - Request each page and a hashed asset twice with `curl`. Confirm caching headers match the table, ETags return 304 on the second request, and responses are Brotli-compressed.
 - Confirm the full favicon set and web manifest exist and load.
 - Confirm `vercel.json` (when present) parses as JSON, starts with the `$schema` line, uses no legacy properties (`name`, `version`, `alias`, `builds`), and has every header value on one line. Run `vercel build` when the Vercel CLI is available.
+- On a desktop browser, confirm the page doesn't rubber-band when scrolled past its ends, and pull-to-refresh still works on a phone.
+- With macOS "Show scroll bars" set to "Always," confirm no unneeded scrollbars appear.
+- Confirm `theme-color` matches the page background in each theme.
 
 ## 14. Accounts, Sign-In and Onboarding
 - Sign up with "Name@Example.com", then try "name@example.com". Confirm the second is treated as the same account and the response does not reveal that the account exists.
@@ -185,4 +208,4 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - Confirm the navbar order and element placement match `layout-patterns.md`, and the page layout matches the standard for the app type (or the user approved the difference).
 - Confirm the theme toggle uses the icon set's standard sun and moon icons, and accessibility options sit in the account section or on a footer-linked "Accessibility" page, with no floating widget.
 - Confirm every download uses a button with a download icon, a label naming the file and format without the size, the `download` attribute, and `Content-Disposition: attachment`.
-
+- Confirm no element uses the HTML `title` attribute as a tooltip, every tooltip appears on hover and keyboard focus, closes with Escape, has no interactive content, and its information is available on touch devices.
