@@ -12,6 +12,7 @@ Set up a new project so every later session builds it to the app-standards rules
 ## 1. Load the standards
 Load the `standards` skill from this plugin. Then read:
 - `${CLAUDE_PLUGIN_ROOT}/skills/standards/references/project-file.md`
+- `${CLAUDE_PLUGIN_ROOT}/skills/standards/references/layout-patterns.md`, to name the standard layout for the app type
 - The Legal Questions section of `${CLAUDE_PLUGIN_ROOT}/skills/standards/references/legal-and-privacy.md`
 
 ## 2. Check for an existing project file
@@ -26,17 +27,19 @@ Use the description in `$ARGUMENTS` (if given) to skip anything it already answe
 5. **Frontend:** recommend per the Frontend and Hosting rules in the standards skill, and let the user choose.
 6. **Host:** Vercel unless the user prefers another.
 7. **Regions:** where the app operates or has users.
-8. **Legal details:** ask whether the user wants to provide them now (legal business name, address, contact email, third-party services, retention periods, and refund terms if payments apply). Never ask for personal information about team members. If the user skips, record `"legalDetails": "pending"`.
+8. **Brand colors:** ask whether the user has brand colors. If not, show a few accent color options as swatches (with their names and how each suits the app) and let the user choose. Never pick one without asking. If the user skips, pick one, say which and why, and record `"accentColor": "claude-chosen"`.
+9. **Logo and favicon:** ask whether the user has them. Without a logo, the header uses the site name as text. Without a favicon, use a generic neutral placeholder.
+10. **Legal details:** ask whether the user wants to provide them now (legal business name, address, contact email, third-party services, retention periods, and refund terms if payments apply). Never ask for personal information about team members. If the user skips, record `"legalDetails": "pending"`.
 
 ## 4. Recommend the stack
-Summarize the recommended stack (frontend, backend, host, email provider if messaging applies, payment provider if payments apply) with one line on why each fits.
+Summarize the recommended stack (frontend, backend, host, email provider if messaging applies, payment provider if payments apply) with one line on why each fits, and name the standard layout for the app type.
 
 ## 5. Write the project file
-Write `.app-standards.json` in the project root following `project-file.md`. Do not store legal details, personal information or secrets in it.
+Write `.app-standards.json` in the project root following `project-file.md`, including the `brand` fields. Do not store legal details, personal information or secrets in it.
 
 ## 6. Confirm and stop
 Tell the user:
-- The settings recorded.
+- The settings recorded, including the chosen accent color.
 - Which rule groups apply because of their answers (for example, "Accounts rules apply: social sign-in, two-factor authentication and an account section").
 - That nothing has been built yet.
 

@@ -10,6 +10,12 @@ Read this before explaining builder launch tasks. Each task lists what it is, wh
 - **How:** In the Vercel project (or chosen host), open the domain settings and add each domain and subdomain. The host shows the DNS records it needs. Add those records at the domain registrar.
 - **Done when:** Each domain loads the site over HTTPS, and the host shows the domain as verified.
 
+### Check the deployed headers
+- **What:** Confirm the live site sends the security and caching headers the project configured.
+- **Why:** A header the host ignores or rejects leaves the site without that protection, and an invalid configuration can stop deployment.
+- **How:** After the first deployment, run `curl -I https://your-domain` or enter the address at the Mozilla HTTP Observatory, and compare the results with the project's header configuration.
+- **Done when:** Every configured header appears on the live site and the Observatory reports no missing security headers.
+
 ### Set production environment variables
 - **What:** Add the production API keys and secrets to the host's environment settings.
 - **Why:** Secrets never live in the code, so the deployed site cannot reach Supabase, payments or email without them.
@@ -85,6 +91,12 @@ Read this before explaining builder launch tasks. Each task lists what it is, wh
 - **Why:** The site may only show real content.
 - **How:** Search the project for `[` in page content and replace each placeholder with real, approved content, or remove the section.
 - **Done when:** No placeholders remain in published pages.
+
+### Replace the placeholder favicon and logo
+- **What:** Swap the generic placeholder favicon, and the text-only logo if one was used, for the real brand assets.
+- **Why:** Browser tabs, bookmarks and shared links show the favicon, so a placeholder looks unfinished.
+- **How:** Provide the logo and favicon files and ask Claude to add them, or replace the files in the project's public folder, keeping the file names in the favicon set.
+- **Done when:** The real favicon shows in the browser tab and the header shows the real logo.
 
 ### Complete humans.txt
 - **What:** Fill in the TEAM and THANKS sections of `/humans.txt`.

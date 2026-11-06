@@ -4,6 +4,7 @@ Read this before writing any content, labels, messages or emails. These rules ap
 
 ## Punctuation
 - No em dashes, en dashes used as dashes, or spaced hyphens used as dashes. Use commas, colons, periods or parentheses instead.
+- No separator characters between inline items: no middle dot (·), bullet (•), dot operator (⋅) or vertical bar (|), including their HTML entities (`&middot;`, `&bull;`). Instead of "5 min read · March 4," use spacing between separate elements, separate lines, or a divider drawn with CSS.
 - No half-sentences or sentence fragments for emphasis.
 
 ## Calls to Action and Buttons
@@ -24,7 +25,16 @@ Every call to action, button and instruction names the action or the outcome.
 
 ## Content Volume
 - Include only as much content in each section as is necessary.
+- Choose the number of items from the content, never from habit. A section with 2 or 5 real items stays at 2 or 5.
 - Use three items only when the real content has exactly three. Never pad or trim content to reach three.
+- A number in a title or introduction ("4 steps," "Five reasons") must match the number of items that follow. Avoid numbers in titles unless the count helps the reader.
+
+## Section Titles
+Section titles describe the actual content, ideally as a specific statement or a "how" or "what" question about it.
+
+**Good:** "How billing works," "What's included in the Pro plan," "Plans and pricing," "Setting up your first project."
+
+**Banned:** "Why it matters," "Why it helps," "Why this matters," "The problem," "The solution," "The bottom line," "Under the hood," "What makes us different," "Here's the thing," "The big picture," "The magic," "Behind the scenes," "Let's dive in," and other titles that could sit above any content.
 
 ## Truthfulness
 - All content must be truthful about the site.

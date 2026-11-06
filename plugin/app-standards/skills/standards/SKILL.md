@@ -2,7 +2,7 @@
 name: standards
 description: Design, UX, writing, accessibility, SEO, legal, security, sign-in and performance standards for building, editing or reviewing any website, web app or software application. Use whenever creating or changing an application's interface, content, accounts or backend, including landing pages, dashboards, SaaS products, admin tools, desktop and mobile apps, even if the user does not mention standards or quality. Does not apply to in-game UIs.
 metadata:
-  version: 2.0.0
+  version: 2.1.0
 ---
 
 # Professional Application Standards
@@ -55,6 +55,8 @@ Creative applications are those whose main purpose is art, design, media, games,
 ### Project Start
 At the start of a new project, ask the builder (together with any other setup questions):
 - The details needed for legal pages (listed in `references/legal-and-privacy.md`).
+- Brand colors. If the user has none, show a few accent color options as swatches and wait for a choice. If the user doesn't answer, pick one, say which and why, and record it in the project file.
+- A logo and favicon. Without a logo, set the site name as text in the site's typeface. Without a favicon, use a generic neutral placeholder and list it under "Open content placeholders."
 - Whether the application is creative, if unclear.
 - Which frontend to use, if unclear, with the recommendations above.
 
@@ -86,8 +88,13 @@ Read each file at the moment it is needed:
 | `references/web-developer-checklist.md` | Building any [Web] project |
 | `references/testing-tools.md` | Testing performance, accessibility or security |
 | `references/verification-checklist.md` | Delivering any build |
+| `references/components.md` | Building cards, buttons, navbar controls, download buttons, the theme toggle or any title |
+| `references/layout-patterns.md` | Laying out any page, navbar or app shell |
 | `references/project-file.md` | Reading or writing `.app-standards.json` |
 | `references/launch-task-guide.md` | Explaining builder launch tasks |
+
+### Enforcement
+- When the end-of-turn check is installed (the app-standards plugin in Claude Code or Cowork), it lists any dashes, separator characters, banned fonts, encoded images or pasted icon drawings, and banned section titles left in files changed during the turn. Fix every one before finishing. After two attempts, the check lets the turn end, and anything still open goes in the delivery summary.
 
 ### Verification
 - Before delivering, run every applicable check in `references/verification-checklist.md`.
@@ -116,7 +123,7 @@ End every build with a summary using these headings. Omit any heading with nothi
 ### Musts
 - Use only one primary accent color. Differentiate with shades of that color instead of introducing a second color (unless specified).
 - Neutrals (black, white, grays) and semantic status colors (error, success, warning) are allowed and do not count as a second color. Charts use shades of the accent first.
-- If the user provides brand colors, use them. Otherwise, create original brand colors. Never copy colors from another similar brand.
+- If the user provides brand colors, use them. Otherwise, offer accent color options and let the user choose (see Project Start). Never pick a color scheme without asking, and never copy colors from another similar brand.
 - Maintain clean color contrast throughout (targets in Section 9).
 - Separate layers and surfaces using clean page elements only: borders, dividers, tonal shades of the background, spacing, and a solid scrim behind modals.
 - Use one corner radius scale across the whole app (for example: small for inputs, medium for cards, large for modals).
@@ -155,6 +162,7 @@ End every build with a summary using these headings. Omit any heading with nothi
 - No headings followed by unnecessary explanations or summaries.
 - No eyebrow labels (small text or badges above a heading). Step counts belong inside the progress component.
 - No italics for emphasis.
+- No title longer than one line on typical displays. On small displays (under 768 px) a title may wrap to two lines at most. Never cut a title off with an ellipsis (details in `references/components.md`).
 - No orphan words: never separate words out of normal text for emphasis, never split a headline into separate lines word by word, and never leave a single word stranded on the last line of a heading or paragraph.
 
 ## 3. Layout and Responsiveness
@@ -166,6 +174,7 @@ End every build with a summary using these headings. Omit any heading with nothi
 - Handle long text cleanly on window resize and across platforms so the layout holds.
 - When an input is focused on a device with an onscreen keyboard, scroll it into view so the keyboard sits below it and never covers it. Fixed or sticky elements must not overlap the focused input.
 - Keyboard handling must not cause major layout shift or change element formatting. The page adjusts its scroll position only.
+- Follow the standard layout for the app type and the standard placement of each element in `references/layout-patterns.md`. Any other layout requires the user's approval.
 - Convert table rows to cards on mobile and on narrow window sizes. Cards keep the same fields, in the same order, labeled with the table's column headers.
 
 ### Do's
@@ -181,6 +190,8 @@ End every build with a summary using these headings. Omit any heading with nothi
 
 ### Musts
 - Use only Material Symbols (professional websites and applications) or Font Awesome (creative applications) for icons. One icon set per project.
+- Use only a logo the user provides, never an invented, AI-generated or borrowed logo, in the header, page title or favicon. Without a logo, set the site name as text. Without a favicon, use a generic neutral placeholder and list it as an open content placeholder.
+- Reference icons from the icon set by name. Never paste an icon's SVG drawing data into the code, and never encode images, logos or fonts as `data:` strings. They are always separate files.
 - Official brand logos are the one exception: use them wherever they represent a third-party service (sign-in buttons, social links), always preferring the brand's official assets over icon-set versions.
 - Keep icons consistent across all pages and with the favicon.
 - Use only images and media the user provides, or unlicensed (free-to-use, no paid license required) stock images and media when none are provided. This covers photos, illustrations, video, audio and any other media.
@@ -216,7 +227,7 @@ Before building loading states, interactions, notices or flows, read `references
 - Use only the loaders, user-error safeguards and notice types defined in `references/ux-patterns.md`.
 
 ### Do's
-- Add tap and click animations for every state: hover, active/pressed, focus-visible, disabled and loading.
+- Give every interactive element, especially buttons and cards, the visible hover, pressed, focus, disabled and loading responses defined in the interaction state table in `references/components.md`. A button or card with no visible response to interaction is incomplete.
 - Minimum tap targets of 44×44 px. Links inside running text are exempt.
 
 ### Don'ts
@@ -259,7 +270,10 @@ Before writing any content, labels, messages or emails, read `references/writing
 ### Don'ts
 - No em dashes, en dashes used as dashes, or spaced hyphens used as dashes.
 - No half-sentences or sentence fragments for emphasis.
-- No content padded or trimmed to fit a rule of three.
+- No content padded or trimmed to fit a rule of three. Choose the number of items from the content, never from habit.
+- A number in a title or introduction ("4 steps") must match the number of items that follow.
+- No separator characters between inline items: no middle dot (·), bullet (•) or vertical bar (|). Use spacing, separate lines or a CSS divider.
+- No vague or dramatic section titles (such as "Why it matters" or "The bottom line"). Titles describe the actual content, ideally as a specific statement or a "how" or "what" question (list in `references/writing.md`).
 - No banned calls to action, vague messages or writing clichés (lists in `references/writing.md`).
 - No raw error codes or stack traces shown to users.
 - No fake reviews, testimonials, user counts, client logos, statistics or other unsupported claims.
@@ -315,6 +329,8 @@ Before writing any content, labels, messages or emails, read `references/writing
 - Never convey information by color alone.
 - Support screen readers (VoiceOver, NVDA, JAWS, TalkBack), zoom to 400% with reflow at 320 px, voice control (visible labels match accessible names) and browser translation tools. Announce dynamic updates through live regions.
 - Provide accessibility options (high-contrast mode, adjustable text size, reduced motion). Device accessibility settings (`prefers-reduced-motion`, `prefers-contrast`, forced colors) apply automatically.
+- Place accessibility options where people expect them (see `references/layout-patterns.md`): the theme toggle in the navbar, and text size, contrast and motion options in the account section or an "Accessibility" page linked from the footer. Never use a floating accessibility widget.
+- The theme toggle uses the icon set's standard sun and moon icons, showing the mode the user will switch to.
 - Default to light mode regardless of the device setting. Provide a dark mode toggle, and remember the choice in a small essential preference cookie so the server renders the right theme with no flash.
 - Every theme and accessibility option works without breaking the layout or styling.
 
@@ -401,3 +417,17 @@ Before building sign-up, sign-in, onboarding or account pages, read `references/
 - **[Accounts]** Provide a dedicated account section, reachable from the user menu on every page, with "Download my data" and account deletion in every app with accounts.
 - **[Accounts]** Cancelling, deleting an account and requesting data deletion each take no more steps than signing up did (one re-authentication and one confirmation don't count), and never require contacting support.
 - **[Accounts]** Email the user about every security change and new-device sign-in.
+
+## 15. Components and Layouts
+
+Before building cards, buttons, navbar controls, download buttons or titles, read `references/components.md`. Before laying out any page, navbar or app shell, read `references/layout-patterns.md`.
+
+### Musts
+- Use cards for collections of separate items people browse or compare, not for single blocks of text, comparable columns of data, or long simple lists.
+- Every card shows an image or an icon. Cards in a group share one image ratio, one internal order and one padding size, stay the same height in a row, and line up their actions along the bottom.
+- A clickable card has one real link (its title, stretched over the card), never nested links, and at most one primary and one secondary action.
+- Text inside cards never overlaps other elements. Cards are tested with longer text, at 200% text size and at every test width.
+- Navbar icon buttons show only the icon at rest, with a tonal rounded square on hover and focus, a 44 px tap area and an accessible name.
+- The navbar follows the standard order: logo on the left, main links, then search, theme toggle, cart, notifications and account on the right, with the main call to action last.
+- Downloads use a real button with a download icon and a label naming the file and format, without the file size.
+

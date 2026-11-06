@@ -1,5 +1,5 @@
 {
-  "description": "app-standards: flags possible rule violations after each file edit, and notes that the standards apply when a session starts in an application project.",
+  "description": "app-standards: flags possible rule violations after each file edit, requires fixes for a short list of rules before a turn ends, and notes that the standards apply when a session starts in an application project.",
   "hooks": {
     "PostToolUse": [
       {
@@ -21,6 +21,17 @@
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run.sh\" session-start",
             "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run.sh\" stop",
+            "timeout": 30
           }
         ]
       }

@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.1.0
+
+### New
+- Section 15, Components and Layouts, with two reference files: `components.md` (cards, interaction states, titles, navbar icon buttons, theme toggle, download buttons, icons and image data) and `layout-patterns.md` (standard layouts by app type, navbar order and element placement).
+- Card rules: when to use cards, an image or icon on every card, single-link clickable cards, equal-height grids, consistent padding, no overlapping text, and testing with longer text and larger text sizes.
+- An interaction state table defining hover, pressed, focus, disabled and loading for every control.
+- Brand colors and the logo are now project-start questions; Claude no longer picks a color scheme without asking.
+- Titles stay on one line on typical displays and two lines at most on small ones, without ellipses.
+- Writing rules for counts that match their titles, separator characters, and banned vague section titles.
+- Rules against encoded images and fonts, and pasted SVG icon drawings.
+- Accessibility settings and the theme toggle follow standard placement, with standard sun and moon icons and no floating widgets.
+- Download buttons with a download icon and a file name and format label.
+- Rewritten Vercel rules with a validated template, the `$schema` line, no legacy properties, and a build check.
+- New lint checks: `separator`, `vague-title`, `encoded-asset` and `vercel-config`.
+- End-of-turn check that requires fixes for dashes, separator characters, banned fonts, encoded assets and vague titles before a turn ends, with a two-attempt limit.
+- `brand` fields in the project file, and launch tasks for checking deployed headers and replacing a placeholder favicon.
+
 ## 2.0.0
 
 The standards skill is now the app-standards plugin.

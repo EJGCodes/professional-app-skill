@@ -9,7 +9,7 @@ The rules come in two forms:
 
 Install one or the other. Installing both loads the same rules twice.
 
-Version 2.0.0. Release history is in [CHANGELOG.md](CHANGELOG.md).
+Version 2.1.0. Release history is in [CHANGELOG.md](CHANGELOG.md).
 
 ## Why it exists
 
@@ -19,12 +19,13 @@ AI-built sites tend to share the same problems: gradient blobs and drop shadows,
 
 | Component | Name | What it does |
 |---|---|---|
-| Skill | `standards` | The full rule set in 14 sections, with 12 reference files Claude reads only when a task needs them |
+| Skill | `standards` | The full rule set in 15 sections, with 14 reference files Claude reads only when a task needs them |
 | Command | `/app-standards:new-app` | Asks the project-start questions, recommends a stack and writes the project file |
 | Command | `/app-standards:audit` | Reviews an existing project and reports violations by severity, without changing files |
 | Command | `/app-standards:launch-tasks` | Writes `LAUNCH-CHECKLIST.md` with the launch tasks only you can do, and explains each one |
 | Agent | `standards-reviewer` | A read-only reviewer that checks builds against the checklist, separately from the session that built them |
 | Hook | Lint | Runs after each file edit and flags problems such as banned fonts, shadows, gradients, unsafe HTML and tokens in browser storage |
+| Hook | End-of-turn check | Before Claude finishes a turn, requires fixes for dashes, separator characters, banned fonts, encoded images or pasted icon drawings, and vague section titles in the files it changed |
 | Hook | Session start | In application folders, tells Claude the rules apply so it loads them before building |
 
 ## What the rules cover
@@ -43,6 +44,7 @@ AI-built sites tend to share the same problems: gradient blobs and drop shadows,
 12. Performance: PageSpeed scores of 90 or more, a JavaScript budget, retries and offline handling.
 13. Web compatibility: browser support, fallbacks when JavaScript fails, print styles and caching headers.
 14. Accounts and onboarding: provider sign-in, two-factor authentication, interactive onboarding and an account section.
+15. Components and layouts: cards, interaction states for every control, navbar order and icon buttons, download buttons, and the standard layout for each app type.
 
 Each rule has an applicability tag (such as Accounts, Payments or Web), so a static landing page never gets login rules and a native app skips web-only rules.
 
@@ -175,8 +177,14 @@ Leave out `value` to make an exception for the whole rule, or add `paths` to lim
 | `sensitive-storage` | Tokens or user data written to localStorage or sessionStorage |
 | `csp-unsafe` | `'unsafe-inline'` or `'unsafe-eval'` for scripts |
 | `number-input` | `type="number"` on ZIP, phone, card or code fields |
+| `separator` | Middle dots and bullets used to separate inline items |
+| `vague-title` | Section titles such as "Why it matters" or "The bottom line" |
+| `encoded-asset` | Images or fonts encoded into the code as `data:` strings, and pasted SVG icon drawings |
+| `vercel-config` | A `vercel.json` that isn't valid JSON, lacks the `$schema` line, or uses legacy properties |
 
-The hook only reports to Claude. It never blocks an edit or changes a file. It skips `node_modules`, build output, lockfiles and minified files. It only sees files Claude writes with its edit tools, not files created through shell commands; the reviewer catches those at the end of a build. Checks that would go off during normal work (clichés, `console.log`, button wording) are left to the reviewer.
+The hook only reports to Claude. It never blocks an edit or changes a file.
+
+The end-of-turn check is stricter for five of these: `dash`, `separator`, `banned-font`, `encoded-asset` and `vague-title`. If any remain in files Claude changed during the turn, Claude has to fix them, or record an exception you explicitly approved, before it can finish. After two attempts the check lets the turn end, and anything still open is listed in the build summary. It skips `node_modules`, build output, lockfiles and minified files. It only sees files Claude writes with its edit tools, not files created through shell commands; the reviewer catches those at the end of a build. Checks that would go off during normal work (clichés, `console.log`, button wording) are left to the reviewer.
 
 To scan a whole project from a terminal:
 
@@ -191,7 +199,7 @@ node plugin/app-standards/hooks/scripts/lint.js --scan path/to/project
 | Rules (skill) | Yes | Yes | Yes |
 | Commands | Yes | Yes | Yes |
 | Reviewer agent | No (Claude checks its own work instead) | Yes | Yes |
-| Lint and session hooks | No | Yes | Yes |
+| Lint, end-of-turn and session hooks | No | Yes | Yes |
 
 ## Folder layout
 
@@ -204,14 +212,14 @@ node plugin/app-standards/hooks/scripts/lint.js --scan path/to/project
 │   └── app-standards/                       the plugin
 │       ├── .claude-plugin/                  (hidden) plugin.json and marketplace.json
 │       ├── skills/
-│       │   ├── standards/                   the rules and 12 reference files
+│       │   ├── standards/                   the rules and 14 reference files
 │       │   ├── new-app/
 │       │   ├── audit/
 │       │   └── launch-tasks/
 │       ├── agents/standards-reviewer.md
 │       └── hooks/
 │           ├── hooks.json
-│           └── scripts/                     lint and session start, in Node and bash
+│           └── scripts/                     lint, end-of-turn check and session start, in Node and bash
 └── skill/
     └── professional-application-standards/  the standalone skill
         ├── SKILL.md
@@ -220,7 +228,7 @@ node plugin/app-standards/hooks/scripts/lint.js --scan path/to/project
 
 ## Security
 
-The hooks run on your computer with your permissions. Both scripts only read files and print messages. They make no network requests and write nothing. As with any plugin, read `plugin/app-standards/hooks/scripts/` before installing.
+The hooks run on your computer with your permissions. The scripts read project files and print messages. They make no network requests. The only thing they write is a small list of the files edited in the current session, kept in your system's temporary folder so the end-of-turn check knows what to re-check. As with any plugin, read `plugin/app-standards/hooks/scripts/` before installing.
 
 ## Contributing
 

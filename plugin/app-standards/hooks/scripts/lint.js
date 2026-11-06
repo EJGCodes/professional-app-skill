@@ -3,10 +3,13 @@
 // Hook mode (default): reads a PostToolUse event on stdin, checks the edited file,
 // and reports possible violations to Claude as non-blocking context (JSON on stdout).
 // Scan mode: `node lint.js --scan <folder>` checks every file and prints a report.
+// Stop mode: `node lint.js --stop` runs at the end of a turn. It re-checks the files edited
+// during the turn for the gate checks below and asks Claude to fix them, at most twice.
 // It only flags. It never blocks or changes files.
 'use strict';
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
 const MAX_FILE_BYTES = 1024 * 1024;
@@ -41,6 +44,19 @@ const ICON_PKG = '(?:lucide(?:-react|-vue(?:-next)?|-svelte|-solid|-angular|-sta
 const ICON_IMPORT_RE = new RegExp('(?:from\\s*|require\\(\\s*|import\\(\\s*|import\\s+)["\']' + ICON_PKG + '(?=["\'\\/])');
 const ICON_DEP_RE = new RegExp('"' + ICON_PKG + '"\\s*:');
 const ICON_CDN_RE = new RegExp('(?:src|href)\\s*=\\s*["\'][^"\']*(?:unpkg|jsdelivr|cdnjs)[^"\']*' + '(?:lucide|heroicons|feather|tabler|phosphor|ionicons)', 'i');
+
+// Checks that must be fixed before a turn ends (all others only flag).
+const GATE_CHECKS = new Set(['dash', 'separator', 'banned-font', 'encoded-asset', 'vague-title']);
+const MAX_STOP_BLOCKS = 2;
+
+const VAGUE_TITLES = [
+  "why it matters", "why this matters", "why it helps", "the problem", "the solution",
+  "the bottom line", "under the hood", "what makes us different", "here's the thing",
+  "the big picture", "the magic", "behind the scenes", "let's dive in"
+];
+const VAGUE_TITLE_RE = new RegExp('(?<![a-z])(' + VAGUE_TITLES.map((s) => s.replace(/'/g, "['\u2019]").replace(/ /g, '\\s+')).join('|') + ')(?![a-z])', 'i');
+const HEADING_RE = /^\s{0,3}#{1,6}\s|<h[1-6][\s>]|\b(?:as|level)=["'{]?h?[1-6]/i;
+const LEGACY_VERCEL_KEYS = ['name', 'version', 'alias', 'builds'];
 
 const CLASS_CONTEXT_RE = /class(?:Name)?\s*=|:class\s*=|class:|@apply|\bcn\(|\bclsx\(|\bcva\(|\btw`|\btwMerge\(/;
 
@@ -162,6 +178,62 @@ const CHECKS = [
     }
   },
   {
+    id: 'separator',
+    label: 'Separator character between inline items (Section 7)',
+    ext: TEXT_EXT,
+    test(line, ext, file) {
+      if (ext === '.json' && path.basename(file) === 'package.json') return [];
+      const hits = [];
+      if (/[\u00B7\u2022\u22C5\u2219]/.test(line)) hits.push('separator character');
+      if (/&(?:middot|bull|sdot);|&#(?:183|8226|8901|x[bB]7|x2022);/.test(line)) hits.push('separator entity');
+      return hits;
+    }
+  },
+  {
+    id: 'vague-title',
+    label: 'Vague or dramatic section title (Section 7, see writing.md)',
+    ext: new Set([...MARKUP_EXT, '.md']),
+    test(line) {
+      if (!HEADING_RE.test(line)) return [];
+      const m = VAGUE_TITLE_RE.exec(line);
+      return m ? [m[1]] : [];
+    }
+  },
+  {
+    id: 'encoded-asset',
+    label: 'Encoded image or font, or pasted icon drawing data (Section 4)',
+    ext: CODE_EXT,
+    test(line) {
+      const hits = [];
+      if (/data:(?:image|font|audio|video|application\/(?:font|x-font|octet-stream|vnd\.ms-fontobject))[^,\s"')]*[;,]/i.test(line)) hits.push('data: string');
+      if (/<path\b[^>]*\sd\s*=\s*\{?\s*["'`][^"'`]{60,}/.test(line) || /^\s*d\s*=\s*\{?\s*["'`][MmLlHhVvCcSsQqTtAaZz][^"'`]{60,}/.test(line)) hits.push('SVG path data');
+      return hits;
+    }
+  },
+  {
+    id: 'vercel-config',
+    label: 'vercel.json problem that can stop deployment (Section 13, see web-developer-checklist.md)',
+    ext: new Set(['.json']),
+    test() { return []; },
+    fileTest(text, file) {
+      if (path.basename(file) !== 'vercel.json') return [];
+      let cfg;
+      try { cfg = JSON.parse(text); } catch (e) { return [{ line: 1, hits: ['invalid JSON'], text: 'vercel.json is not valid JSON: ' + String(e.message).slice(0, 80) }]; }
+      const out = [];
+      if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg)) return [{ line: 1, hits: ['not an object'], text: 'vercel.json must be a JSON object' }];
+      if (!cfg.$schema) out.push({ line: 1, hits: ['missing $schema'], text: 'Add "$schema": "https://openapi.vercel.sh/vercel.json"' });
+      const lines = text.split(/\r?\n/);
+      for (const key of LEGACY_VERCEL_KEYS) {
+        if (Object.prototype.hasOwnProperty.call(cfg, key)) {
+          const idx = lines.findIndex((l) => new RegExp('^\\s*"' + key + '"\\s*:').test(l));
+          out.push({ line: idx + 1 || 1, hits: ['legacy ' + key], text: 'Legacy property "' + key + '" is deprecated' });
+        }
+      }
+      if (cfg.builds && cfg.functions) out.push({ line: 1, hits: ['builds with functions'], text: '"builds" cannot be combined with "functions"' });
+      return out;
+    }
+  },
+  {
     id: 'number-input',
     label: 'type="number" on a digit-only field that is not a quantity (Section 6)',
     ext: MARKUP_EXT,
@@ -232,6 +304,12 @@ function lintFile(file, root, exceptions) {
     const applies = check.ext.has(ext) || (check.extraFiles && check.extraFiles.includes(base));
     if (!applies) continue;
     const found = [];
+    if (check.fileTest) {
+      for (const f of check.fileTest(text, file)) {
+        const hits = f.hits.filter((h) => !isExcepted(exceptions, check.id, h, rel));
+        if (hits.length) found.push({ line: f.line, hits, text: f.text });
+      }
+    }
     lines.forEach((line, i) => {
       if (line.length > 2000) return;
       const hits = check.test(line, ext, file).filter((h) => !isExcepted(exceptions, check.id, h, rel));
@@ -285,6 +363,70 @@ function scan(target) {
   process.exit(0);
 }
 
+function statePath(sessionId) {
+  const safe = String(sessionId || 'default').replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 100);
+  return path.join(os.tmpdir(), 'app-standards-hooks', safe + '.json');
+}
+
+function readState(sessionId) {
+  try {
+    const s = JSON.parse(fs.readFileSync(statePath(sessionId), 'utf8'));
+    return { files: Array.isArray(s.files) ? s.files : [], blocks: Number(s.blocks) || 0 };
+  } catch (e) {
+    return { files: [], blocks: 0 };
+  }
+}
+
+function writeState(sessionId, state) {
+  try {
+    const p = statePath(sessionId);
+    fs.mkdirSync(path.dirname(p), { recursive: true });
+    fs.writeFileSync(p, JSON.stringify(state));
+  } catch (e) { /* state is best-effort */ }
+}
+
+function clearState(sessionId) {
+  try { fs.unlinkSync(statePath(sessionId)); } catch (e) { /* nothing to clear */ }
+}
+
+function stop(raw) {
+  let input;
+  try { input = JSON.parse(raw || '{}'); } catch (e) { process.exit(0); }
+  const sessionId = input.session_id;
+  const state = readState(sessionId);
+  if (!state.files.length) { clearState(sessionId); process.exit(0); }
+  const reports = [];
+  for (const entry of state.files) {
+    const file = entry.file;
+    const root = entry.root || path.dirname(file);
+    if (!fs.existsSync(file) || shouldSkip(file, root)) continue;
+    const results = lintFile(file, root, loadExceptions(root)).filter((r) => GATE_CHECKS.has(r.check.id));
+    if (results.length) reports.push(formatFile(path.relative(root, file) || path.basename(file), results));
+  }
+  if (!reports.length || state.blocks >= MAX_STOP_BLOCKS) { clearState(sessionId); process.exit(0); }
+  state.blocks += 1;
+  writeState(sessionId, state);
+  const last = state.blocks >= MAX_STOP_BLOCKS;
+  let reason = 'app-standards end-of-turn check: files changed in this turn still break rules that must be fixed before finishing (dashes, separator characters, banned fonts, encoded images or pasted icon drawings, and vague section titles).\n' +
+    reports.join('\n\n') +
+    (last
+      ? '\nThis is the final check for this turn. Fix what you can; anything left open goes under "Notes" in the delivery summary, or is recorded as an exception in .app-standards.json if the user explicitly approved it.'
+      : '\nFix each one, or record it as an exception in .app-standards.json if the user explicitly approved it.');
+  if (reason.length > MAX_MESSAGE_CHARS) reason = reason.slice(0, MAX_MESSAGE_CHARS) + '\n(truncated)';
+  process.stdout.write(JSON.stringify({ decision: 'block', reason }) + '\n');
+  process.exit(0);
+}
+
+function recordEdit(sessionId, file, root) {
+  if (!sessionId) return;
+  const state = readState(sessionId);
+  if (!state.files.some((f) => f.file === file)) {
+    state.files.push({ file, root });
+    if (state.files.length > 500) state.files = state.files.slice(-500);
+    writeState(sessionId, state);
+  }
+}
+
 function hook(raw) {
   let input;
   try { input = JSON.parse(raw || '{}'); } catch (e) { process.exit(0); }
@@ -295,6 +437,7 @@ function hook(raw) {
   if (!path.isAbsolute(file)) file = path.resolve(cwd, file);
   const root = findProjectRoot(path.dirname(file), cwd);
   if (shouldSkip(file, root)) process.exit(0);
+  recordEdit(input.session_id, file, root);
   const results = lintFile(file, root, loadExceptions(root));
   if (!results.length) process.exit(0);
   let message = 'app-standards lint found possible rule violations in the file just edited.\n' +
@@ -311,10 +454,11 @@ const args = process.argv.slice(2);
 if (args[0] === '--scan') {
   scan(args[1] || process.cwd());
 } else {
+  const handler = args[0] === '--stop' ? stop : hook;
   let raw = '';
   process.stdin.setEncoding('utf8');
   process.stdin.on('data', (c) => { raw += c; });
   process.stdin.on('end', () => {
-    try { hook(raw); } catch (e) { process.exit(0); }
+    try { handler(raw); } catch (e) { process.exit(0); }
   });
 }

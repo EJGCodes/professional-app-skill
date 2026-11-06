@@ -10,6 +10,7 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - List every color token. Confirm one accent hue plus its shades, with all remaining colors being neutrals, semantic status colors or official brand colors on provider buttons and brand logos.
 - Review each badge and chip. Remove any that do not tell the user something they need, including chips holding only step text.
 - Confirm all corner radii come from the defined radius scale.
+- Confirm the user chose the accent color, or that the choice and reason were stated when the user didn't answer.
 
 ## 2. Typography
 - Search all `font-family` declarations and font files for every banned font name in `fonts.md`. Expect zero results.
@@ -17,6 +18,7 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - Search the markup for `<em>`, `<i>` and `font-style: italic`. Confirm each is a title of a work, a foreign term or a quotation.
 - Check every heading for subtext or eyebrow labels. Remove any that do not add unique information.
 - Take screenshots at each test width and look for single words stranded on their own line.
+- At 1280 px, confirm every title fits on one line. At 320 and 375 px, confirm no title wraps to more than two lines. Confirm no title uses `text-overflow: ellipsis`.
 
 ## 3. Layout and Responsiveness
 - At 320, 375, 768, 1024, 1440 and 1920 px, run `document.documentElement.scrollWidth <= document.documentElement.clientWidth`. Expect true.
@@ -32,6 +34,9 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - Confirm no unconverted GIF is over 200 KB, and converted GIF videos are muted and pause with reduced motion.
 - Confirm videos have a poster image and captions.
 - Confirm every chart is bound to real data. Remove any decorative or growth-suggesting bar sequence.
+- Search the code for `data:image`, `data:font`, `data:application` and `;base64,`. Expect zero.
+- Search markup for inline `<path d="...">` drawing data. Expect zero outside files the user provided.
+- Confirm the logo and favicon are user-provided files, or the site name as text and a generic placeholder favicon listed in the delivery summary.
 
 ## 5. Motion, Loading and Interaction
 - Search CSS keyframes and transitions for animated `top`, `left`, `right`, `bottom`, `width`, `height` or `margin`. Expect zero.
@@ -50,6 +55,7 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - Load each page fresh. Confirm nothing appears except the allowed notices in `ux-patterns.md`, in their defined form.
 - Paste into every field, including passwords. Confirm paste works.
 - Go offline mid-action. Confirm the offline notice appears and the action is kept in memory and retried when the connection returns.
+- For every button, link, card, input and icon button, confirm the styles define hover, pressed (`:active`) and `:focus-visible` states, plus disabled and loading where they apply, matching the interaction state table in `components.md`. Hover, press and tab to each in the browser and confirm a visible response.
 
 ## 6. Forms and Input
 - Confirm every field matches the input reference table in `forms-and-data.md`, has a visible label, and has a computed font size of at least 16px.
@@ -68,6 +74,9 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - Search for testimonials, statistics, user counts and logos. Confirm each is real or a clearly marked placeholder listed in the delivery summary.
 - Confirm dates, numbers and currency are formatted with `Intl` and no ambiguous dates appear.
 - **[Backend]** Review the schema. Confirm UTC `timestamptz` dates, no floating-point money, consistent naming, constraints, and migrations for every change.
+- Search all visible text for `·`, `•`, `⋅`, `&middot;`, `&bull;` and ` | ` used as separators. Expect zero.
+- For every title or introduction that states a number ("4 steps"), count the items that follow. Confirm they match.
+- List every section title. Confirm none is on the banned list in `writing.md` and each describes its actual content.
 
 ## 8. Navigation, Structure and Search
 - Run a link checker on every internal and external link. Expect zero broken links and zero redirect chains.
@@ -149,6 +158,7 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - Emulate print media on each page and save a PDF. Confirm hidden elements leave no gaps, formatting stays consistent, and dedicated print layouts render correctly.
 - Request each page and a hashed asset twice with `curl`. Confirm caching headers match the table, ETags return 304 on the second request, and responses are Brotli-compressed.
 - Confirm the full favicon set and web manifest exist and load.
+- Confirm `vercel.json` (when present) parses as JSON, starts with the `$schema` line, uses no legacy properties (`name`, `version`, `alias`, `builds`), and has every header value on one line. Run `vercel build` when the Vercel CLI is available.
 
 ## 14. Accounts, Sign-In and Onboarding
 - Sign up with "Name@Example.com", then try "name@example.com". Confirm the second is treated as the same account and the response does not reveal that the account exists.
@@ -165,3 +175,14 @@ Use Playwright where available, running visual and interaction checks in Chromiu
 - Change the email and password. Confirm each requires the password, the old address gets a notification, other sessions are signed out after the password change, and a security email is sent.
 - Download the user's data. Confirm the file includes everything stored about the user and no other users' personal data.
 - Count the steps to cancel, delete the account and request data deletion. Confirm each is no more than sign-up took (excluding one re-authentication and one confirmation) and none requires contacting support.
+
+## 15. Components and Layouts
+- Confirm cards are used only for collections of separate items, and every card shows an image or an icon.
+- Confirm cards in each group share one image ratio, one internal order and one padding size, stay the same height in a row, and line up their actions at the bottom.
+- Confirm clickable cards have a single stretched link and no nested links or buttons inside links, and at most one primary and one secondary action.
+- At every test width, with text 40% longer and at 200% text size, check every text element's bounding box against its neighbors inside each card. Expect no overlaps.
+- Confirm navbar icon buttons have no border, outline or background at rest, show a tonal rounded square on hover and focus, have a 44 px tap area and an accessible name.
+- Confirm the navbar order and element placement match `layout-patterns.md`, and the page layout matches the standard for the app type (or the user approved the difference).
+- Confirm the theme toggle uses the icon set's standard sun and moon icons, and accessibility options sit in the account section or on a footer-linked "Accessibility" page, with no floating widget.
+- Confirm every download uses a button with a download icon, a label naming the file and format without the size, the `download` attribute, and `Content-Disposition: attachment`.
+

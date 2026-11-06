@@ -16,6 +16,11 @@ Read this before reading or writing `.app-standards.json`. The file lives in the
   "backend": "Supabase",
   "regions": ["United States"],
   "legalDetails": "pending",
+  "brand": {
+    "accentColor": "user-chosen",
+    "logo": "provided",
+    "favicon": "placeholder"
+  },
   "exceptions": [
     {
       "rule": "banned-font",
@@ -41,6 +46,9 @@ Read this before reading or writing `.app-standards.json`. The file lives in the
 | `backend` | Backend name | The chosen backend (Supabase by default) |
 | `regions` | List of countries or regions | Decides legal content and minimum age |
 | `legalDetails` | `"provided"`, `"pending"` or `"declined"` | Whether the builder has answered the legal questions. When `"pending"`, ask again after the first build |
+| `brand.accentColor` | `"user-chosen"` or `"claude-chosen"` | Whether the user picked the accent color. `"claude-chosen"` means the user didn't answer, so offer the options again at the next chance |
+| `brand.logo` | `"provided"` or `"text"` | Whether the header uses the user's logo or the site name as text |
+| `brand.favicon` | `"provided"` or `"placeholder"` | Whether the favicon is the user's or a generic placeholder |
 | `exceptions` | List | Rule exceptions the user explicitly approved |
 
 Never store legal business details, personal information or secrets in this file. Legal details go directly into the legal pages.
@@ -70,3 +78,9 @@ Record an exception only when the user explicitly asks for something a rule bans
 | `sensitive-storage` | Tokens or user data written to localStorage or sessionStorage |
 | `csp-unsafe` | `'unsafe-inline'` or `'unsafe-eval'` in a script source |
 | `number-input` | `type="number"` on ZIP, phone, card, code or PIN fields |
+| `separator` | Middle dots, bullets and dot operators used as inline separators, including their HTML entities |
+| `vague-title` | Banned vague or dramatic section titles in headings |
+| `encoded-asset` | Images or fonts encoded as `data:` strings, and pasted SVG icon drawing data |
+| `vercel-config` | A `vercel.json` that is not valid JSON, lacks the `$schema` line, or uses legacy properties |
+
+The end-of-turn check requires fixes for `dash`, `separator`, `banned-font`, `encoded-asset` and `vague-title` in files changed during the turn. All other checks only flag.

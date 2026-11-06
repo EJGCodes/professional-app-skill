@@ -200,10 +200,23 @@ The SEO score target applies only to indexable public pages. Performance, Access
 - Remove `X-Powered-By` and detailed `Server` values.
 - HSTS preload only when the builder confirms it.
 
-**Vercel configuration (default host):**
+## Vercel Configuration
+
+Vercel is the default host. A `vercel.json` with outdated or invalid settings stops the site from deploying, so follow these rules exactly.
+
+**Rules:**
+- Start every `vercel.json` with `"$schema": "https://openapi.vercel.sh/vercel.json"`, so editors validate it.
+- Use only current, documented properties. Never use the legacy properties `name`, `version`, `alias` or `builds`, and never combine `builds` with `functions`.
+- Prefer `headers`, `redirects`, `rewrites`, `cleanUrls` and `trailingSlash` over `routes`.
+- Keep `vercel.json` minimal. With Next.js, SvelteKit, Nuxt or Astro, set headers in the framework's own configuration where it supports them (for example, `headers()` in `next.config`), and use `vercel.json` only for what the framework can't do.
+- Every header value is a single line. Never break a long value, such as a Content-Security-Policy, across lines.
+- The file must be valid JSON: no comments and no trailing commas.
+
+**Template:**
 
 ```json
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
@@ -216,18 +229,34 @@ The SEO score target applies only to indexable public pages. Performance, Access
         { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
       ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
     }
   ]
 }
 ```
 
-Add the Content-Security-Policy per the rules above (hashes in the static config, nonces in middleware). On other hosts, write the equivalent configuration.
+- Change `/assets/(.*)` to the folder where the framework writes hashed files (such as `/_next/static/(.*)` for Next.js or `/_astro/(.*)` for Astro). Frameworks on Vercel often set this caching already; don't duplicate it.
+- Add the Content-Security-Policy per the rules above: hashes in the static configuration, nonces in middleware.
+- Enable only the Permissions-Policy features the site uses (passkeys, for example, need `publickey-credentials-get`).
+
+**Validation before delivery:**
+- Parse `vercel.json` as JSON and check that every top-level key is a current documented property.
+- When the Vercel CLI is available, run `vercel build` and fix every error.
+- When it isn't, list the build check under "Unverified checks," and add "Check deployed headers" to the builder launch tasks.
+
+On other hosts, follow the same principles and write the equivalent configuration.
 
 ## Builder Launch Tasks
 Tasks Claude cannot complete. Add each applicable one to the delivery summary, explained with `launch-task-guide.md`. `/app-standards:launch-tasks` writes them to a checklist file.
 
 **Domains and hosting**
 - Connect the domain and any subdomains in Vercel (or the chosen host), and create their DNS records.
+- Check the deployed headers after the first deployment.
 - Set the production environment variables in the host.
 
 **Email**
@@ -248,7 +277,7 @@ Tasks Claude cannot complete. Add each applicable one to the delivery summary, e
 
 **Content and legal**
 - Fill in every open legal field and have the legal pages reviewed.
-- Replace every content placeholder.
+- Replace every content placeholder, including a placeholder favicon or text-only logo.
 - Fill in the TEAM and THANKS sections of humans.txt.
 - Confirm a security contact so security.txt can be published, and renew it before its `Expires` date.
 
