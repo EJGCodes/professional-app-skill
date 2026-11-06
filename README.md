@@ -70,14 +70,14 @@ To install it from this folder so it loads in every session:
 To install it from GitHub, push the contents of the `plugin/app-standards` folder to a repository, so that its hidden `.claude-plugin` folder sits at the top of the repository. Then run:
 
 ```bash
-/plugin marketplace add <owner>/<repo>
+/plugin marketplace add EJGCodes/professional-application-skill
 /plugin install app-standards@app-standards-marketplace
 ```
 
 On Claude Code 2.1.275 or later, one command does both:
 
 ```bash
-/plugin install app-standards --marketplace <owner>/<repo>
+/plugin install app-standards --marketplace EJGCodes/professional-application-skill
 ```
 
 The hidden `.claude-plugin` folder inside `app-standards` holds two files: `plugin.json`, which describes the plugin, and `marketplace.json`, which lets Claude Code install it from a folder or repository.
